@@ -1,5 +1,5 @@
-import { app, BrowserWindow, ipcMain } from "electron";
-import path from "path";
+import { app, BrowserWindow, ipcMain } from "electron"
+import path from 'node:path'
 
 process.env.APP_ROOT = path.join(__dirname, "..");
 
@@ -10,11 +10,10 @@ function createWindow() {
     webPreferences: {}
   });
 
-  if (process.env.VITE_DEV_SERVER_URL) {
-    win.loadURL(process.env.VITE_DEV_SERVER_URL);
+  win.loadURL(process.env.NITRO_LISTEN_URL);
+
+  if (process.env.NODE_ENV === "development") {
     win.webContents.openDevTools();
-  } else {
-    win.loadFile(path.join(process.env.VITE_PUBLIC!, "index.html"));
   }
 }
 
