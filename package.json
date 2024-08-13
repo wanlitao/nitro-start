@@ -6,9 +6,9 @@
   "author": "wanlitao <wanlitao_3055601@outlook.com>",
   "scripts": {
     "build": "nitro build",
-    "dev": "tsc -p electron && nitro dev",
+    "dev": "tsc -p src/electron && nitro dev",
     "prepare": "nitro prepare",
-    "preview": "node .output/server/index.mjs"
+    "preview": "node dist/backend/server/index.mjs"
   },
   "devDependencies": {
     "electron": "^31.3.1",

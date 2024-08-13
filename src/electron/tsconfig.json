@@ -8,6 +8,6 @@
     "allowJs": true,
     "resolveJsonModule": true,
     "jsx": "preserve",
-    "outDir": "../dist-electron"
-  }  
+    "outDir": "../../dist/electron"
+  }
 }
