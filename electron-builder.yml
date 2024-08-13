@@ -2,11 +2,11 @@ appId: com.nitro.electron
 productName: nitro electron app
 copyright: Copyright © 2024 wanlitao
 directories:
-  output: dist
+  output: release
   buildResources: resources
 files:
   - from: .
     filter:
       - package.json
-      - .output
+      - dist
 publish: null

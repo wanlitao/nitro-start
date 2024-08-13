@@ -3,11 +3,10 @@
     "forceConsistentCasingInFileNames": true,
     "strict": false,    
     "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "module": "CommonJS",
+    "esModuleInterop": true,
     "allowJs": true,
     "resolveJsonModule": true,
-    "jsx": "preserve",
     "outDir": "../../dist/electron"
   }
 }

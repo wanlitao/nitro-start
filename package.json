@@ -4,11 +4,12 @@
   "description": "nitro backend packed by electron",
   "version": "1.0.0",
   "author": "wanlitao <wanlitao_3055601@outlook.com>",
+  "main": "dist/electron/main.js",  
   "scripts": {
     "build": "nitro build",
     "dev": "tsc -p src/electron && nitro dev",
     "prepare": "nitro prepare",
-    "preview": "node dist/backend/server/index.mjs"
+    "preview": "node --env-file=.env dist/backend/server/index.mjs"
   },
   "devDependencies": {
     "electron": "^31.3.1",
