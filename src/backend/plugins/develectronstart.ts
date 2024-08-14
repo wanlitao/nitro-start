@@ -15,11 +15,11 @@ export default defineNitroPlugin(async (nitroApp) => {
     const argv = [".", "--no-sandbox"];
     process.electronApp = spawn(electronPath, argv, {
       stdio: "inherit",
-      env: { ...process.env, NODE_ENV: "development" },
+      env: { ...process.env, NODE_ENV: "development" }
     });
 
     process.electronApp.once("exit", () => {
-      delete process.electronApp;      
+      delete process.electronApp;
     });
 
     nitroApp.hooks.hookOnce("close", () => {
