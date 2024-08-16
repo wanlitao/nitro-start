@@ -1,5 +1,5 @@
 appId: com.nitro.electron
-productName: nitro electron app
+productName: nitro-electron-app
 copyright: Copyright © 2024 wanlitao
 asar: false
 directories:
@@ -10,4 +10,5 @@ files:
     filter:
       - package.json
       - dist
+      - .env.production
 publish: null

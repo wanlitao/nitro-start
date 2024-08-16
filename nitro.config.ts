@@ -8,5 +8,5 @@ export default defineNitroConfig({
   experimental: {
     openAPI: true,
     asyncContext: true
-  }
+  }  
 })

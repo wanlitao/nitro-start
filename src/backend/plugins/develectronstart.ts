@@ -2,8 +2,8 @@ export default defineNitroPlugin(async (nitroApp) => {
   const listenHost = process.env.HOST || "localhost";
   const listenPort = process.env.PORT || 3000;
 
-  process.env.NITRO_LISTEN_URL = `http://${listenHost}:${listenPort}/`;
-
+  process.env.NITRO_LISTEN_URL = `http://${listenHost}:${listenPort}/`;  
+  
   if (process.env.NODE_ENV === "development") {
     process.env.NITRO_SWAGGER_URL = `${process.env.NITRO_LISTEN_URL}_nitro/swagger`;
 
