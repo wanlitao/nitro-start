@@ -11,4 +11,6 @@ files:
       - package.json
       - dist
       - .env.production
-publish: null
+publish:
+  provider: generic
+  url: https://nitro.wanlitao.com/release

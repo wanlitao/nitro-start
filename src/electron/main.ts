@@ -1,4 +1,5 @@
 import { app, BrowserWindow, ipcMain } from "electron";
+import { ConfigureUpdater } from "./updater";
 import dotenv from "dotenv";
 import path from "node:path";
 import { fork } from "node:child_process";
@@ -16,7 +17,9 @@ function createWindow() {
   let win = new BrowserWindow({
     width: 1280,
     height: 960,
-    webPreferences: {}
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js")
+    }
   });
 
   if (is_development) {
@@ -25,6 +28,8 @@ function createWindow() {
   } else {
     win.loadURL(process.env.NITRO_LISTEN_URL);
   }
+
+  return win;
 }
 
 function startBackgroundNitroServer() {
@@ -48,7 +53,9 @@ app.whenReady().then(() => {
     resolveBackgroundNitroListenUrl();
   }
 
-  createWindow();
+  let mainWin = createWindow();
+
+  ConfigureUpdater(mainWin);
 });
 
 app.on("before-quit", () => {
