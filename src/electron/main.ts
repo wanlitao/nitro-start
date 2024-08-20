@@ -1,8 +1,8 @@
-import { app, BrowserWindow, ipcMain } from "electron";
-import { ConfigureUpdater } from "./updater";
+import { app, BrowserWindow, ipcMain, utilityProcess } from "electron";
+import { ConfigureUpdater } from "./autoupdate/updater";
 import dotenv from "dotenv";
 import path from "node:path";
-import { fork } from "node:child_process";
+import fs from "node:fs";
 
 process.env.APP_ROOT = path.join(__dirname, "../..");
 
@@ -29,14 +29,23 @@ function createWindow() {
     win.loadURL(process.env.NITRO_LISTEN_URL);
   }
 
+  injectUpdaterHandlerJs(win); // 注入自动更新处理代码
+  
   return win;
+}
+
+function injectUpdaterHandlerJs(win: BrowserWindow) {
+  win.webContents.on("did-finish-load", () => {
+    const injectUpdaterHandlerJsCode = fs.readFileSync(path.join(__dirname, 'autoupdate/inject-updater-handler.js')).toString();
+    win.webContents.executeJavaScript(injectUpdaterHandlerJsCode);
+  });
 }
 
 function startBackgroundNitroServer() {
   const nitro_dist = path.join(process.env.APP_ROOT, "dist/backend");
   const nitro_server_indexjs = path.join(nitro_dist, "server/index.mjs");
 
-  nitro_server_process = fork(nitro_server_indexjs, { stdio: "inherit" });
+  nitro_server_process = utilityProcess.fork(nitro_server_indexjs);
 }
 
 function resolveBackgroundNitroListenUrl() {

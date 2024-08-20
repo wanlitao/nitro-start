@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from "electron";
 
-contextBridge.exposeInMainWorld("ipcRenderer", {
+contextBridge.exposeInMainWorld("electronIpc", {
   on(...args: Parameters<typeof ipcRenderer.on>) {
     const [channel, listener] = args;
     return ipcRenderer.on(channel, (event, ...eventArgs) =>
@@ -18,6 +18,14 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
   invoke(...args: Parameters<typeof ipcRenderer.invoke>) {
     const [channel, ...omit] = args;
     return ipcRenderer.invoke(channel, ...omit);
+  },
+  checkUpdate(...args: any[]) {
+    return ipcRenderer.send("check-update", ...args);
+  },
+  confirmUpdate(...args: any[]) {
+    return ipcRenderer.send("comfirm-update", ...args);
+  },
+  updateApp(...args: any[]) {
+    return ipcRenderer.send("update-app", ...args);
   }
-  
 });
