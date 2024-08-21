@@ -19,15 +19,18 @@ export const ConfigureUpdater = (win: BrowserWindow) => {
     mainWin.webContents.send("updater-not-available", info);
   });
   autoUpdater.on("error", (err, msg) => {
-    mainWin.webContents.send("updater-error", err);
+    mainWin.webContents.send("updater-error", err, msg);
   });
   autoUpdater.on("download-progress", (progressInfo) => {
     mainWin.webContents.send("updater-download-progress", progressInfo);
   });
   autoUpdater.on("update-downloaded", (event) => {
+    ipcMain.emit("update-downloaded"); // 标记更新已下载完成
+
     mainWin.webContents.send("updater-downloaded", event);
-    // 响应-更新app
-    ipcMain.on("update-app", (e, args) => {
+    
+    // 响应-安装更新
+    ipcMain.on("install-update", (e, args) => {
       autoUpdater.quitAndInstall();
     });
   });
@@ -37,8 +40,8 @@ export const ConfigureUpdater = (win: BrowserWindow) => {
     autoUpdater.checkForUpdates();
   });
 
-  // 响应-确认更新
-  ipcMain.on("comfirm-update", (e, args) => {
+  // 响应-下载更新
+  ipcMain.on("download-update", (e, args) => {
     autoUpdater.downloadUpdate();
   });
 };

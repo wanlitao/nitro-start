@@ -22,10 +22,16 @@ contextBridge.exposeInMainWorld("electronIpc", {
   checkUpdate(...args: any[]) {
     return ipcRenderer.send("check-update", ...args);
   },
-  confirmUpdate(...args: any[]) {
-    return ipcRenderer.send("comfirm-update", ...args);
+  downloadUpdate(...args: any[]) {
+    return ipcRenderer.send("download-update", ...args);
   },
-  updateApp(...args: any[]) {
-    return ipcRenderer.send("update-app", ...args);
+  installUpdate(...args: any[]) {
+    return ipcRenderer.send("install-update", ...args);
+  },
+  showNotification(...args: any[]) {
+    return ipcRenderer.send("show-notification", ...args);
+  },
+  showMessageBox(...args: any[]) {
+    return ipcRenderer.invoke("show-messagebox", ...args);
   }
 });

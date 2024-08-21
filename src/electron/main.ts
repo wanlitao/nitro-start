@@ -1,4 +1,6 @@
 import { app, BrowserWindow, ipcMain, utilityProcess } from "electron";
+import { ConfigureMessageBoxHandler } from "./handlers/messagebox";
+import { ConfigureNotificationHandler } from "./handlers/notification";
 import { ConfigureUpdater } from "./autoupdate/updater";
 import dotenv from "dotenv";
 import path from "node:path";
@@ -12,12 +14,14 @@ if (!is_development) {
 }
 
 let nitro_server_process;
+let is_update_downloaded = false; // 是否更新已下载完成
 
 function createWindow() {
   let win = new BrowserWindow({
     width: 1280,
     height: 960,
     webPreferences: {
+      nodeIntegration: true,
       preload: path.join(__dirname, "preload.js")
     }
   });
@@ -62,9 +66,15 @@ app.whenReady().then(() => {
     resolveBackgroundNitroListenUrl();
   }
 
-  let mainWin = createWindow();
+  ConfigureMessageBoxHandler();
+  ConfigureNotificationHandler();
 
+  let mainWin = createWindow();
   ConfigureUpdater(mainWin);
+
+  ipcMain.on("update-downloaded", () => {
+    is_update_downloaded = true;
+  })
 });
 
 app.on("before-quit", () => {
@@ -76,6 +86,11 @@ app.on("before-quit", () => {
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
-    app.quit();
+    if (is_update_downloaded) {
+      ipcMain.emit("install-update");
+    }
+    else {
+      app.quit();
+    }
   }
 });
