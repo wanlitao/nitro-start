@@ -21,9 +21,8 @@ function createWindow() {
     width: 1280,
     height: 960,
     webPreferences: {
-      nodeIntegration: true,
-      preload: path.join(__dirname, "preload.js")
-    }
+      preload: path.join(__dirname, "preload.js"),
+    },
   });
 
   if (is_development) {
@@ -34,13 +33,17 @@ function createWindow() {
   }
 
   injectUpdaterHandlerJs(win); // 注入自动更新处理代码
-  
+
   return win;
 }
 
 function injectUpdaterHandlerJs(win: BrowserWindow) {
   win.webContents.on("did-finish-load", () => {
-    const injectUpdaterHandlerJsCode = fs.readFileSync(path.join(__dirname, 'autoupdate/inject-updater-handler.js')).toString();
+    const injectUpdaterHandlerJsCode = fs
+      .readFileSync(
+        path.join(__dirname, "autoupdate/inject-updater-handler.js")
+      )
+      .toString();
     win.webContents.executeJavaScript(injectUpdaterHandlerJsCode);
   });
 }
@@ -69,12 +72,18 @@ app.whenReady().then(() => {
   ConfigureMessageBoxHandler();
   ConfigureNotificationHandler();
 
-  let mainWin = createWindow();
-  ConfigureUpdater(mainWin);
+  createWindow();
+  ConfigureUpdater();
 
   ipcMain.on("update-downloaded", () => {
     is_update_downloaded = true;
-  })
+  });
+
+  app.on("activate", () => {
+    // On macOS it's common to re-create a window in the app when the
+    // dock icon is clicked and there are no other windows open.
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
 });
 
 app.on("before-quit", () => {
@@ -88,8 +97,7 @@ app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     if (is_update_downloaded) {
       ipcMain.emit("install-update");
-    }
-    else {
+    } else {
       app.quit();
     }
   }

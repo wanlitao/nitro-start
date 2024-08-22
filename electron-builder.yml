@@ -13,4 +13,4 @@ files:
       - .env.production
 publish:
   provider: generic
-  url: https://nitro.wanlitao.com/release
+  url: http://172.17.20.222:9000/internalfile/test/electron/nitro/release
