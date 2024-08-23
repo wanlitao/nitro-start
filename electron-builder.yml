@@ -11,6 +11,9 @@ files:
       - package.json
       - dist
       - .env.production
+protocols:
+  name: nitro-electron-app
+  schemes: [nitro-electron]
 publish:
   provider: generic
   url: http://172.17.20.222:9000/internalfile/test/electron/nitro/release

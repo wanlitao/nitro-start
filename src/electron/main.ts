@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, utilityProcess } from "electron";
+import { app, BrowserWindow, ipcMain, utilityProcess, dialog } from "electron";
 import { ConfigureMessageBoxHandler } from "./handlers/messagebox";
 import { ConfigureNotificationHandler } from "./handlers/notification";
 import { ConfigureUpdater } from "./autoupdate/updater";
@@ -13,11 +13,12 @@ if (!is_development) {
   dotenv.config({ path: path.join(process.env.APP_ROOT, ".env.production") });
 }
 
+let mainWindow;
 let nitro_server_process;
 let is_update_downloaded = false; // 是否更新已下载完成
 
 function createWindow() {
-  let win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1280,
     height: 960,
     webPreferences: {
@@ -26,15 +27,13 @@ function createWindow() {
   });
 
   if (is_development) {
-    win.loadURL(process.env.NITRO_SWAGGER_URL);
-    win.webContents.openDevTools();
+    mainWindow.loadURL(process.env.NITRO_SWAGGER_URL);
+    mainWindow.webContents.openDevTools();
   } else {
-    win.loadURL(process.env.NITRO_LISTEN_URL);
+    mainWindow.loadURL(process.env.NITRO_LISTEN_URL);
   }
 
-  injectUpdaterHandlerJs(win); // 注入自动更新处理代码
-
-  return win;
+  injectUpdaterHandlerJs(mainWindow); // 注入自动更新处理代码
 }
 
 function injectUpdaterHandlerJs(win: BrowserWindow) {
@@ -60,6 +59,38 @@ function resolveBackgroundNitroListenUrl() {
   const nitro_port = process.env.NITRO_PORT || 3000;
 
   process.env.NITRO_LISTEN_URL = `http://${nitro_host}:${nitro_port}/`;
+}
+
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient("nitro-electron", process.execPath, [
+      path.resolve(process.argv[1]),
+    ]);
+  }
+} else {
+  app.setAsDefaultProtocolClient("nitro-electron");
+}
+
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on("second-instance", (event, commandLineArgs, workingDirectory) => {
+    // Someone tried to run a second instance, we should focus our window.
+    if (mainWindow) {
+      mainWindow.isMinimized() && mainWindow.restore();
+      mainWindow.focus();
+    }
+
+    dialog.showErrorBox(
+      "Welcome Back",
+      `You arrived from: ${commandLineArgs.pop().slice(0, -1)}`
+    );
+  });
+
+  app.on("open-url", (event, url) => {
+    dialog.showErrorBox("Welcome Back", `You arrived from: ${url}`);
+  });
 }
 
 app.whenReady().then(() => {
