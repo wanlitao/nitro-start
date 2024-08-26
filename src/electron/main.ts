@@ -1,20 +1,13 @@
-import { app, BrowserWindow, ipcMain, utilityProcess, dialog } from "electron";
-import { ConfigureMessageBoxHandler } from "./handlers/messagebox";
-import { ConfigureNotificationHandler } from "./handlers/notification";
-import { ConfigureUpdater } from "./autoupdate/updater";
-import dotenv from "dotenv";
+import { app, BrowserWindow, ipcMain, dialog } from "electron";
+import { isDevelopment, isProduction } from "./utils/env";
+import { startBackgroundNitroServer } from "./helpers/start-nitro-server";
+import { configureMessageBoxHandler } from "./handlers/messagebox";
+import { configureNotificationHandler } from "./handlers/notification";
+import { configureUpdater } from "./autoupdate/updater";
 import path from "node:path";
 import fs from "node:fs";
 
-process.env.APP_ROOT = path.join(__dirname, "../..");
-
-const is_development = process.env.NODE_ENV === "development";
-if (!is_development) {
-  dotenv.config({ path: path.join(process.env.APP_ROOT, ".env.production") });
-}
-
 let mainWindow;
-let nitro_server_process;
 let is_update_downloaded = false; // 是否更新已下载完成
 
 function createWindow() {
@@ -26,7 +19,7 @@ function createWindow() {
     },
   });
 
-  if (is_development) {
+  if (isDevelopment) {
     mainWindow.loadURL(process.env.NITRO_SWAGGER_URL);
     mainWindow.webContents.openDevTools();
   } else {
@@ -47,20 +40,7 @@ function injectUpdaterHandlerJs(win: BrowserWindow) {
   });
 }
 
-function startBackgroundNitroServer() {
-  const nitro_dist = path.join(process.env.APP_ROOT, "dist/backend");
-  const nitro_server_indexjs = path.join(nitro_dist, "server/index.mjs");
-
-  nitro_server_process = utilityProcess.fork(nitro_server_indexjs);
-}
-
-function resolveBackgroundNitroListenUrl() {
-  const nitro_host = process.env.NITRO_HOST || "localhost";
-  const nitro_port = process.env.NITRO_PORT || 3000;
-
-  process.env.NITRO_LISTEN_URL = `http://${nitro_host}:${nitro_port}/`;
-}
-
+// 设置 对应协议启动应用（开发模式调试）
 if (process.defaultApp) {
   if (process.argv.length >= 2) {
     app.setAsDefaultProtocolClient("nitro-electron", process.execPath, [
@@ -71,10 +51,12 @@ if (process.defaultApp) {
   app.setAsDefaultProtocolClient("nitro-electron");
 }
 
+// 单实例锁定
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   app.quit();
 } else {
+  // win url唤醒 处理
   app.on("second-instance", (event, commandLineArgs, workingDirectory) => {
     // Someone tried to run a second instance, we should focus our window.
     if (mainWindow) {
@@ -88,23 +70,22 @@ if (!gotTheLock) {
     );
   });
 
+  // mac url唤醒 处理
   app.on("open-url", (event, url) => {
     dialog.showErrorBox("Welcome Back", `You arrived from: ${url}`);
   });
 }
 
 app.whenReady().then(() => {
-  if (!is_development) {
+  if (isProduction) {
     startBackgroundNitroServer();
-
-    resolveBackgroundNitroListenUrl();
   }
 
-  ConfigureMessageBoxHandler();
-  ConfigureNotificationHandler();
+  configureMessageBoxHandler();
+  configureNotificationHandler();
 
   createWindow();
-  ConfigureUpdater();
+  configureUpdater();
 
   ipcMain.on("update-downloaded", () => {
     is_update_downloaded = true;
@@ -115,13 +96,6 @@ app.whenReady().then(() => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
-});
-
-app.on("before-quit", () => {
-  if (nitro_server_process) {
-    nitro_server_process.kill();
-    nitro_server_process = null;
-  }
 });
 
 app.on("window-all-closed", () => {

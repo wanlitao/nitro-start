@@ -17,3 +17,6 @@ protocols:
 publish:
   provider: generic
   url: http://172.17.20.222:9000/internalfile/test/electron/nitro/release
+nsis:
+  deleteAppDataOnUninstall: true
+  include: build/installer.nsh
