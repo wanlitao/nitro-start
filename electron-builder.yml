@@ -21,6 +21,7 @@ nsis:
   deleteAppDataOnUninstall: true
   include: build/installer.nsh
 linux:
+  artifactName: ${productName}_${version}_${platform}_${arch}.${ext}
   target:
     - target: AppImage
       arch:

@@ -6,7 +6,16 @@ export default defineNitroConfig({
   },  
   experimental: {
     openAPI: true,
+    database: true,
     asyncContext: true,
+  },
+  database: {
+    default:{
+      connector: "sqlite",
+      options: {
+        name: "db",
+      }
+    }
   },
   compatibilityDate: "2024-08-27",
 });

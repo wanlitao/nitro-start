@@ -4,6 +4,7 @@
   "description": "nitro backend packed by electron",
   "version": "1.0.0",
   "author": "wanlitao <wanlitao_3055601@outlook.com>",
+  "homepage": "https://github.com/wanlitao/nitro-start",
   "main": "dist/electron/main.js",
   "scripts": {
     "build": "tsc -p src/electron && nitro build && electron-builder",
@@ -13,6 +14,7 @@
     "preview": "node --env-file=.env dist/backend/server/index.mjs"
   },
   "devDependencies": {
+    "better-sqlite3": "^11.2.1",
     "electron": "^31.3.1",
     "electron-builder": "^24.13.3",
     "nitropack": "latest"
