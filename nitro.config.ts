@@ -13,7 +13,7 @@ export default defineNitroConfig({
     default:{
       connector: "sqlite",
       options: {
-        name: "db",
+        name: "testdb",
       }
     }
   },

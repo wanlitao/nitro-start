@@ -9,17 +9,18 @@
   "scripts": {
     "build": "tsc -p src/electron && nitro build && electron-builder",
     "build:linux": "tsc -p src/electron && nitro build && electron-builder --linux AppImage deb",
-    "dev": "tsc -p src/electron && nitro dev",
+    "dev": "tsc -p src/electron && pnpm rebuild better-sqlite3 && nitro dev",
     "prepare": "nitro prepare",
     "preview": "node --env-file=.env dist/backend/server/index.mjs"
   },
   "devDependencies": {
-    "better-sqlite3": "^11.2.1",
     "electron": "^31.3.1",
     "electron-builder": "^24.13.3",
     "nitropack": "latest"
   },
   "dependencies": {
+    "better-sqlite3": "^11.2.1",
+    "db0": "^0.1.4",
     "dotenv": "^16.4.5",
     "electron-updater": "^6.3.1"
   }
