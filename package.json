@@ -2,13 +2,14 @@
   "private": true,
   "name": "nitro-electron-app",
   "description": "nitro backend packed by electron",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "wanlitao <wanlitao_3055601@outlook.com>",
   "homepage": "https://github.com/wanlitao/nitro-start",
   "main": "dist/electron/main.js",
   "scripts": {
     "build": "tsc -p src/electron && nitro build && electron-builder",
-    "build:linux": "tsc -p src/electron && nitro build && electron-builder --linux AppImage deb",
+    "build:linux": "tsc -p src/electron && nitro build && electron-builder --linux",
+    "build:deb:arm64": "tsc -p src/electron && nitro build && electron-builder --linux deb --arm64",
     "dev": "tsc -p src/electron && pnpm rebuild better-sqlite3 && nitro dev",
     "prepare": "nitro prepare",
     "preview": "node --env-file=.env dist/backend/server/index.mjs"

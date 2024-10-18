@@ -19,13 +19,18 @@ publish:
   url: http://172.17.20.222:9000/internalfile/test/electron/nitro/release
 nsis:
   deleteAppDataOnUninstall: true
-  include: build/installer.nsh
+  include: build/installer/win/nsis-installer.nsh
 linux:
   artifactName: ${productName}_${version}_${platform}_${arch}.${ext}
   target:
     - target: AppImage
       arch:
         - x64
+        - arm64
     - target: deb
       arch:
         - x64
+        - arm64
+deb:
+  afterInstall: build/installer/linux/after-install.tpl
+  afterRemove: build/installer/linux/after-remove.tpl

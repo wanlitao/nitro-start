@@ -33,5 +33,9 @@ contextBridge.exposeInMainWorld("electronIpc", {
   },
   showMessageBox(...args: any[]) {
     return ipcRenderer.invoke("show-messagebox", ...args);
-  }
+  },
+});
+
+ipcRenderer.on("nitro-server-console-output", (event, message) => {
+  console.log("[Nitro Server Process Console]:", message);
 });
