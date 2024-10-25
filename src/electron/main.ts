@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog } from "electron";
+import { app, BrowserWindow, ipcMain, dialog, Tray, Menu } from "electron";
 import { isDevelopment, isProduction } from "./utils/env";
 import { startBackgroundNitroServer } from "./helpers/start-nitro-server";
 import { configureMessageBoxHandler } from "./handlers/messagebox";
@@ -14,6 +14,7 @@ import fs from "node:fs";
 
 let mainWindow: BrowserWindow;
 let is_update_downloaded = false; // 是否更新已下载完成
+let is_quiting = false; // 是否正在退出
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -33,9 +34,12 @@ function createWindow() {
 
   injectUpdaterHandlerJs(mainWindow); // 注入自动更新处理代码
 
-  // 监听窗口关闭事件
-  mainWindow.on("closed", () => {
-    mainWindow = null; // 清理引用
+  // 主窗口关闭时隐藏窗口而不是退出应用
+  mainWindow.on("close", (event) => {
+    if (!is_quiting) {
+      event.preventDefault();
+      mainWindow.hide();
+    }
   });
 }
 
@@ -48,6 +52,53 @@ function injectUpdaterHandlerJs(win: BrowserWindow) {
       .toString();
     win.webContents.executeJavaScript(injectUpdaterHandlerJsCode);
   });
+}
+
+function createTray() {
+  const iconPath = resolveTrayIconPath();
+
+  const tray = new Tray(iconPath);
+
+  // 设置托盘图标的悬停提示
+  tray.setToolTip("nitro electron app");
+
+  // 创建一个右键菜单
+  const contextMenu = Menu.buildFromTemplate([
+    { label: "显示窗口", click: () => mainWindow.show() },
+    { type: "separator" },
+    { label: "退出", click: quitApp },
+  ]);
+
+  // 将菜单设置为托盘图标的上下文菜单
+  tray.setContextMenu(contextMenu);
+
+  // 监听托盘图标的点击事件
+  tray.on("click", (event) => {
+    mainWindow.show();
+  });
+}
+
+function resolveTrayIconPath() {
+  let iconPath = "";
+  if (process.platform === "win32") {
+    iconPath = path.join(__dirname, "icons", "icon_16x16.ico");
+  } else if (process.platform === "darwin") {
+    iconPath = path.join(__dirname, "icons", "icon_32x32.png");
+  } else {
+    iconPath = path.join(__dirname, "icons", "icon_16x16.png");
+  }
+  return iconPath;
+}
+
+function quitApp() {
+  // 标识 应用正在退出
+  is_quiting = true;
+
+  if (is_update_downloaded) {
+    ipcMain.emit("install-update");
+  } else {
+    app.quit();
+  }
 }
 
 // 设置 对应协议启动应用（开发模式调试）
@@ -91,6 +142,7 @@ if (!gotTheLock) {
     configureNotificationHandler();
 
     createWindow();
+    createTray(); // 添加系统托盘
     configureUpdater();
 
     configureProtocolUrlHandler((protocolUrl) => {
@@ -117,11 +169,7 @@ if (!gotTheLock) {
 
   app.on("window-all-closed", () => {
     if (process.platform !== "darwin") {
-      if (is_update_downloaded) {
-        ipcMain.emit("install-update");
-      } else {
-        app.quit();
-      }
+      quitApp();
     }
   });
 }
