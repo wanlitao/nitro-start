@@ -60,7 +60,7 @@ function createTray() {
   const tray = new Tray(iconPath);
 
   // 设置托盘图标的悬停提示
-  tray.setToolTip("nitro electron app");
+  tray.setToolTip(app.name);
 
   // 创建一个右键菜单
   const contextMenu = Menu.buildFromTemplate([
