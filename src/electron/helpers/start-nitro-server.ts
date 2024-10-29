@@ -48,7 +48,11 @@ export const startBackgroundNitroServer = () => {
 
   nitro_server_process = utilityProcess.fork(nitro_server_indexjs, [], {
     stdio: "pipe",
-    execArgv: ["--enable-source-maps", "--abort-on-uncaught-exception"],
+    execArgv: [
+      "--enable-source-maps",
+      "--trace-warnings",
+      "--abort-on-uncaught-exception",
+    ],
   });
 
   configureNitroServerConsoleOutput();
