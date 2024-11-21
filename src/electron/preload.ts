@@ -25,8 +25,8 @@ contextBridge.exposeInMainWorld("electronIpc", {
   downloadUpdate(...args: any[]) {
     return ipcRenderer.send("download-update", ...args);
   },
-  installUpdate(...args: any[]) {
-    return ipcRenderer.send("install-update", ...args);
+  quitToinstallUpdate(...args: any[]) {
+    return ipcRenderer.send("quit-to-install-update", ...args);
   },
   showNotification(...args: any[]) {
     return ipcRenderer.send("show-notification", ...args);

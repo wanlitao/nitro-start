@@ -4,10 +4,11 @@ import path from "node:path";
 let nitro_server_process;
 
 const resolveBackgroundNitroListenUrl = () => {
-  const nitro_host = process.env.NITRO_HOST || "localhost";
-  const nitro_port = process.env.NITRO_PORT || 3000;
+  const nitro_host = process.env.NITRO_HOST || process.env.HOST || "localhost";
+  const nitro_port = process.env.NITRO_PORT || process.env.PORT || 3000;
 
   process.env.NITRO_LISTEN_URL = `http://${nitro_host}:${nitro_port}/`;
+  process.env.NITRO_SWAGGER_URL = `${process.env.NITRO_LISTEN_URL}_swagger`;
 };
 
 const listenAppQuitToStopNitroServer = () => {

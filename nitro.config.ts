@@ -9,6 +9,14 @@ export default defineNitroConfig({
     database: true,
     asyncContext: true,
   },
+  openAPI: {
+    production: "runtime",
+    meta: {
+      title: "nitro-sample",
+      description: "nitro sample backend api",
+      version: "1.0",
+    }
+  },
   database: {
     default:{
       connector: "sqlite",

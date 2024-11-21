@@ -25,11 +25,10 @@ function createWindow() {
     },
   });
 
+  mainWindow.loadURL(process.env.NITRO_LISTEN_URL);
+
   if (isDevelopment) {
-    mainWindow.loadURL(process.env.NITRO_SWAGGER_URL);
     mainWindow.webContents.openDevTools();
-  } else {
-    mainWindow.loadURL(process.env.NITRO_LISTEN_URL);
   }
 
   injectUpdaterHandlerJs(mainWindow); // 注入自动更新处理代码
@@ -152,6 +151,10 @@ if (!gotTheLock) {
 
     ipcMain.on("update-downloaded", () => {
       is_update_downloaded = true;
+    });
+
+    ipcMain.on("quit-to-install-update", () => {
+      quitApp();
     });
 
     ipcMain.on("nitro-server-console", (event, message) => {

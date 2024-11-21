@@ -9,7 +9,7 @@ window.askForInstallUpdate = function () {
     })
     .then((result) => {
       if (result === 0) {
-        window.electronIpc.installUpdate();
+        window.electronIpc.quitToinstallUpdate();
       } else if (result === 1) {
         // 10分钟后再次询问
         setTimeout(window.askForInstallUpdate, 1000 * 60 * 10);

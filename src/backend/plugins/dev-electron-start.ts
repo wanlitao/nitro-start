@@ -1,12 +1,11 @@
 export default defineNitroPlugin(async (nitroApp) => {
-  const listenHost = process.env.HOST || "localhost";
-  const listenPort = process.env.PORT || 3000;
+  const listenHost = process.env.NITRO_HOST || process.env.HOST || "localhost";
+  const listenPort = process.env.NITRO_PORT || process.env.PORT || 3000;
 
   process.env.NITRO_LISTEN_URL = `http://${listenHost}:${listenPort}/`;
+  process.env.NITRO_SWAGGER_URL = `${process.env.NITRO_LISTEN_URL}_swagger`;
 
   if (process.env.NODE_ENV === "development") {
-    process.env.NITRO_SWAGGER_URL = `${process.env.NITRO_LISTEN_URL}_nitro/swagger`;
-
     const { spawn } = await import("node:child_process");
 
     const electron = await import("electron");
